@@ -15,7 +15,7 @@ A Spring Boot REST API application for managing employees, departments, projects
 
 ```
 employee-management/
-├── src/main/java/com/example/employeemanagement/
+├── src/main/java/com/employeemanagement/
 │   ├── config/          # DataLoader for seed data
 │   ├── controller/     # REST controllers
 │   ├── dto/            # Request & Response DTOs
@@ -53,7 +53,8 @@ spring.datasource.password=root
 ## Running the Application
 
 ```bash
-cd /Users/gauravdalal/employee-management
+git clone https://github.com/gaurav-dalal/emsystem.git
+cd emsystem
 mvn spring-boot:run
 ```
 
