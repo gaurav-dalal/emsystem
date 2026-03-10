@@ -23,32 +23,27 @@ public class EmployeeProjectController {
 
     @GetMapping
     public ResponseEntity<List<EmployeeProjectResponse>> getAllAssignments() {
-        log.info("GET /api/v1/employee-projects");
         return ResponseEntity.ok(employeeProjectService.findAll());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<EmployeeProjectResponse> getAssignmentById(@PathVariable Long id) {
-        log.info("GET /api/v1/employee-projects/{}", id);
-        return ResponseEntity.ok(employeeProjectService.findById(id));
+                return ResponseEntity.ok(employeeProjectService.findById(id));
     }
 
     @PostMapping
     public ResponseEntity<EmployeeProjectResponse> createAssignment(@Valid @RequestBody EmployeeProjectRequest request) {
-        log.info("POST /api/v1/employee-projects - Assigning employee {} to project {}", request.getEmployeeId(), request.getProjectId());
         return ResponseEntity.status(HttpStatus.CREATED).body(employeeProjectService.create(request));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<EmployeeProjectResponse> updateAssignment(@PathVariable Long id,
                                                                     @Valid @RequestBody EmployeeProjectRequest request) {
-        log.info("PUT /api/v1/employee-projects/{}", id);
         return ResponseEntity.ok(employeeProjectService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAssignment(@PathVariable Long id) {
-        log.info("DELETE /api/v1/employee-projects/{}", id);
         employeeProjectService.delete(id);
         return ResponseEntity.noContent().build();
     }

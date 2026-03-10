@@ -1,6 +1,6 @@
 package com.employeemanagement.service;
 
-import com.employeemanagement.dto.request.ProjectDTO;
+import com.employeemanagement.dto.request.ProjectRequest;
 import com.employeemanagement.dto.response.ProjectResponse;
 import com.employeemanagement.entity.Department;
 import com.employeemanagement.entity.Project;
@@ -25,25 +25,24 @@ public class ProjectService {
 
     @Transactional(readOnly = true)
     public List<ProjectResponse> findAll() {
-        log.info("Fetching all projects");
-        List<ProjectResponse> projects = projectRepository.findAll().stream()
+
+        return projectRepository.findAll()
+                .stream()
                 .map(this::toResponse)
-                .collect(Collectors.toList());
-        log.info("Found {} projects", projects.size());
-        return projects;
+                .toList();
     }
 
     @Transactional(readOnly = true)
     public ProjectResponse findById(Long id) {
-        log.info("Fetching project with id: {}", id);
-        Project project = projectRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Project", id));
+
+        Project project = getProjectOrThrow(id);
+
         return toResponse(project);
     }
 
     @Transactional
-    public ProjectResponse create(ProjectDTO request) {
-        log.info("Creating project with name: {}", request.getName());
+    public ProjectResponse create(ProjectRequest request) {
+
         Department department = departmentRepository.findById(request.getDepartmentId())
                 .orElseThrow(() -> new ResourceNotFoundException("Department", request.getDepartmentId()));
 
@@ -52,16 +51,16 @@ public class ProjectService {
                 .description(request.getDescription())
                 .department(department)
                 .build();
-        ProjectResponse response = toResponse(projectRepository.save(project));
-        log.info("Created project with id: {}", response.getId());
-        return response;
+
+        log.info("project creatted");
+        return toResponse(projectRepository.save(project));
     }
 
     @Transactional
-    public ProjectResponse update(Long id, ProjectDTO request) {
+    public ProjectResponse update(Long id, ProjectRequest request) {
         log.info("Updating project with id: {}", id);
-        Project project = projectRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Project", id));
+
+        Project project = getProjectOrThrow(id);
 
         Department department = departmentRepository.findById(request.getDepartmentId())
                 .orElseThrow(() -> new ResourceNotFoundException("Department", request.getDepartmentId()));
@@ -78,10 +77,8 @@ public class ProjectService {
     @Transactional
     public void delete(Long id) {
         log.info("Deleting project with id: {}", id);
-        if (!projectRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Project", id);
-        }
-        projectRepository.deleteById(id);
+        Project project = getProjectOrThrow(id);
+        projectRepository.delete(project);
         log.info("Deleted project with id: {}", id);
     }
 
@@ -93,5 +90,10 @@ public class ProjectService {
                 .departmentId(project.getDepartment().getId())
                 .departmentName(project.getDepartment().getName())
                 .build();
+    }
+
+    private Project getProjectOrThrow(Long id) {
+        return projectRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Project", id));
     }
 }

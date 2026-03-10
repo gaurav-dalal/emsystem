@@ -75,8 +75,8 @@ class DepartmentControllerTest {
     @Test
     void createDepartment_shouldReturn201() throws Exception {
         DepartmentRequest request = DepartmentRequest.builder()
-                .name("HR")
-                .location("Building B")
+                .departmentName("HR")
+                .departmentLocation("Building B")
                 .build();
 
         DepartmentResponse response = DepartmentResponse.builder()
@@ -99,8 +99,8 @@ class DepartmentControllerTest {
     @Test
     void updateDepartment_shouldReturn200() throws Exception {
         DepartmentRequest request = DepartmentRequest.builder()
-                .name("Engineering Updated")
-                .location("Building C")
+                .departmentName("Engineering Updated")
+                .departmentLocation("Building C")
                 .build();
 
         DepartmentResponse response = DepartmentResponse.builder()

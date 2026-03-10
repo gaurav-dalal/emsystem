@@ -1,6 +1,6 @@
 package com.employeemanagement.controller;
 
-import com.employeemanagement.dto.request.ProjectDTO;
+import com.employeemanagement.dto.request.ProjectRequest;
 import com.employeemanagement.dto.response.ProjectResponse;
 import com.employeemanagement.exception.GlobalExceptionHandler;
 import com.employeemanagement.service.ProjectService;
@@ -78,7 +78,7 @@ class ProjectControllerTest {
 
     @Test
     void createProject_shouldReturn201() throws Exception {
-        ProjectDTO request = ProjectDTO.builder()
+        ProjectRequest request = ProjectRequest.builder()
                 .name("New Project")
                 .description("Project description")
                 .departmentId(1L)
@@ -92,7 +92,7 @@ class ProjectControllerTest {
                 .departmentName("Engineering")
                 .build();
 
-        when(projectService.create(any(ProjectDTO.class))).thenReturn(response);
+        when(projectService.create(any(ProjectRequest.class))).thenReturn(response);
 
         mockMvc.perform(post("/api/v1/projects")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -100,12 +100,12 @@ class ProjectControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name", is("New Project")));
 
-        verify(projectService, times(1)).create(any(ProjectDTO.class));
+        verify(projectService, times(1)).create(any(ProjectRequest.class));
     }
 
     @Test
     void updateProject_shouldReturn200() throws Exception {
-        ProjectDTO request = ProjectDTO.builder()
+        ProjectRequest request = ProjectRequest.builder()
                 .name("Updated Project")
                 .description("Updated description")
                 .departmentId(1L)
@@ -116,7 +116,7 @@ class ProjectControllerTest {
                 .name("Updated Project")
                 .build();
 
-        when(projectService.update(eq(1L), any(ProjectDTO.class))).thenReturn(response);
+        when(projectService.update(eq(1L), any(ProjectRequest.class))).thenReturn(response);
 
         mockMvc.perform(put("/api/v1/projects/1")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -124,7 +124,7 @@ class ProjectControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name", is("Updated Project")));
 
-        verify(projectService, times(1)).update(eq(1L), any(ProjectDTO.class));
+        verify(projectService, times(1)).update(eq(1L), any(ProjectRequest.class));
     }
 
     @Test

@@ -28,19 +28,13 @@ public class EmployeeProjectService {
 
     @Transactional(readOnly = true)
     public List<EmployeeProjectResponse> findAll() {
-        log.info("Fetching all employee-project assignments");
-        List<EmployeeProjectResponse> assignments = employeeProjectRepository.findAll().stream()
-                .map(this::toResponse)
-                .collect(Collectors.toList());
-        log.info("Found {} assignments", assignments.size());
-        return assignments;
+        return employeeProjectRepository.findAll().stream()
+                .map(this::toResponse).toList();
     }
 
     @Transactional(readOnly = true)
     public EmployeeProjectResponse findById(Long id) {
-        log.info("Fetching employee-project assignment with id: {}", id);
-        EmployeeProject ep = employeeProjectRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("EmployeeProject", id));
+        EmployeeProject ep = getAssignmentOrThrow(id);
         return toResponse(ep);
     }
 
@@ -66,8 +60,7 @@ public class EmployeeProjectService {
     @Transactional
     public EmployeeProjectResponse update(Long id, EmployeeProjectRequest request) {
         log.info("Updating assignment with id: {}", id);
-        EmployeeProject ep = employeeProjectRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("EmployeeProject", id));
+        EmployeeProject ep = getAssignmentOrThrow(id);
 
         Employee employee = employeeRepository.findById(request.getEmployeeId())
                 .orElseThrow(() -> new ResourceNotFoundException("Employee", request.getEmployeeId()));
@@ -104,5 +97,10 @@ public class EmployeeProjectService {
                 .assignedDate(ep.getAssignedDate())
                 .role(ep.getRole())
                 .build();
+    }
+
+    private EmployeeProject getAssignmentOrThrow(Long id) {
+        return employeeProjectRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("EmployeeProject", id));
     }
 }

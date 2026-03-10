@@ -29,7 +29,6 @@ public class Project {
     @JoinColumn(name = "department_id", nullable = false)
     private Department department;
 
-    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
+    @OneToMany(mappedBy = "project")
     private List<EmployeeProject> employeeProjects = new ArrayList<>();
 }

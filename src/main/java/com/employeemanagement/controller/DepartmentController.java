@@ -23,32 +23,32 @@ public class DepartmentController {
 
     @GetMapping
     public ResponseEntity<List<DepartmentResponse>> getAllDepartments() {
-        log.info("GET /api/v1/departments");
+
         return ResponseEntity.ok(departmentService.findAll());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<DepartmentResponse> getDepartmentById(@PathVariable Long id) {
-        log.info("GET /api/v1/departments/{}", id);
+
         return ResponseEntity.ok(departmentService.findById(id));
     }
 
     @PostMapping
     public ResponseEntity<DepartmentResponse> createDepartment(@Valid @RequestBody DepartmentRequest request) {
-        log.info("POST /api/v1/departments - Creating department: {}", request.getName());
+
         return ResponseEntity.status(HttpStatus.CREATED).body(departmentService.create(request));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<DepartmentResponse> updateDepartment(@PathVariable Long id,
                                                                @Valid @RequestBody DepartmentRequest request) {
-        log.info("PUT /api/v1/departments/{}", id);
+
         return ResponseEntity.ok(departmentService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteDepartment(@PathVariable Long id) {
-        log.info("DELETE /api/v1/departments/{}", id);
+
         departmentService.delete(id);
         return ResponseEntity.noContent().build();
     }

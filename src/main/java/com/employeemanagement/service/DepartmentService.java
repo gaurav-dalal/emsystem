@@ -1,9 +1,11 @@
 package com.employeemanagement.service;
 
+
 import com.employeemanagement.dto.request.DepartmentRequest;
 import com.employeemanagement.dto.response.DepartmentResponse;
 import com.employeemanagement.entity.Department;
 import com.employeemanagement.exception.ResourceNotFoundException;
+
 import com.employeemanagement.repository.DepartmentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -19,64 +20,56 @@ import java.util.stream.Collectors;
 public class DepartmentService {
 
     private final DepartmentRepository departmentRepository;
+    private final DepartmentMapper mapper;
 
     @Transactional(readOnly = true)
     public List<DepartmentResponse> findAll() {
-        log.info("Fetching all departments");
-        List<DepartmentResponse> departments = departmentRepository.findAll().stream()
-                .map(this::toResponse)
-                .collect(Collectors.toList());
-        log.info("Found {} departments", departments.size());
-        return departments;
+
+        return departmentRepository.findAll()
+                .stream()
+                .map(mapper::toResponse)
+                .toList();
     }
 
     @Transactional(readOnly = true)
     public DepartmentResponse findById(Long id) {
-        log.info("Fetching department with id: {}", id);
-        Department department = departmentRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Department", id));
-        return toResponse(department);
+        Department department = getDepartmentOrThrow(id);
+        return mapper.toResponse(department);
     }
 
     @Transactional
     public DepartmentResponse create(DepartmentRequest request) {
-        log.info("Creating department with name: {}", request.getName());
         Department department = Department.builder()
-                .name(request.getName())
-                .location(request.getLocation())
+                .name(request.getDepartmentName())
+                .location(request.getDepartmentLocation())
                 .build();
-        DepartmentResponse response = toResponse(departmentRepository.save(department));
-        log.info("Created department with id: {}", response.getId());
-        return response;
+        Department savedDepartment = departmentRepository.save(department);
+        log.info("Department created with id {}", savedDepartment.getId());
+
+        return mapper.toResponse(savedDepartment);
     }
 
     @Transactional
     public DepartmentResponse update(Long id, DepartmentRequest request) {
-        log.info("Updating department with id: {}", id);
-        Department department = departmentRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Department", id));
-        department.setName(request.getName());
-        department.setLocation(request.getLocation());
-        DepartmentResponse response = toResponse(departmentRepository.save(department));
-        log.info("Updated department with id: {}", id);
-        return response;
+        Department department = getDepartmentOrThrow(id);
+        department.setName(request.getDepartmentName());
+        department.setLocation(request.getDepartmentLocation());
+        Department updatedDepartment = departmentRepository.save(department);
+        log.info("Department {} updated", id);
+
+        return mapper.toResponse(updatedDepartment);
     }
 
     @Transactional
     public void delete(Long id) {
-        log.info("Deleting department with id: {}", id);
-        if (!departmentRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Department", id);
-        }
-        departmentRepository.deleteById(id);
-        log.info("Deleted department with id: {}", id);
+        Department department = getDepartmentOrThrow(id);
+        departmentRepository.delete(department);
+        log.info("Department {} deleted", id);
     }
 
-    private DepartmentResponse toResponse(Department department) {
-        return DepartmentResponse.builder()
-                .id(department.getId())
-                .name(department.getName())
-                .location(department.getLocation())
-                .build();
+    private Department getDepartmentOrThrow(Long id) {
+
+        return departmentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Department", id));
     }
 }

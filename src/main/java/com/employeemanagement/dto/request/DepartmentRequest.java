@@ -13,10 +13,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class DepartmentRequest {
 
-    @NotBlank(message = "Name is required")
+    @NotBlank(message = "Department Name is required")
     @Size(max = 100)
-    private String name;
+    private String departmentName;
 
     @Size(max = 200)
-    private String location;
+    private String departmentLocation;
 }

@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -22,59 +21,56 @@ public class EmployeeService {
 
     private final EmployeeRepository employeeRepository;
     private final DepartmentRepository departmentRepository;
+    private final EmployeeMapper mapper;
 
     @Transactional(readOnly = true)
     public List<EmployeeResponse> findAll() {
-        log.info("Fetching all employees");
-        List<EmployeeResponse> employees = employeeRepository.findAll().stream()
-                .map(this::toResponse)
-                .collect(Collectors.toList());
-        log.info("Found {} employees", employees.size());
-        return employees;
+        log.info(" inside FindALl ");
+        return employeeRepository.findAll()
+                .stream()
+                .map(mapper::toResponse)
+                .toList();
     }
 
     @Transactional(readOnly = true)
     public EmployeeResponse findById(Long id) {
-        log.info("Fetching employee with id: {}", id);
-        Employee employee = employeeRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Employee with ID "+ id +" is not available"));
-        return toResponse(employee);
+        log.info(" inside find by id ------------- ");
+        Employee employee = getEmployeeOrThrow(id);
+        return mapper.toResponse(employee);
     }
 
     @Transactional
     public EmployeeResponse create(EmployeeRequest request) {
-        log.info("Creating employee with email: {}", request.getEmail());
-        if (employeeRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("Employee with email " + request.getEmail() + " already exists");
-        }
-        Department department = departmentRepository.findById(request.getDepartmentId())
-                .orElseThrow(() -> new ResourceNotFoundException("Department", request.getDepartmentId()));
+        employeeRepository.findByEmail(request.getEmail())
+                .ifPresent(e -> {
+                    throw new IllegalArgumentException(
+                            "Employee with email " + request.getEmail() + " already exists");
+                });
 
-        Employee employee = Employee.builder()
-                .name(request.getName())
-                .email(request.getEmail())
-                .salary(request.getSalary())
-                .hireDate(request.getHireDate())
-                .department(department)
-                .build();
+        Department department = getDepartmentOrThrow(request.getDepartmentId());
 
-        EmployeeResponse response = toResponse(employeeRepository.save(employee));
-        log.info("Created employee with id: {}", response.getId());
-        return response;
+        Employee employee = mapper.toEntity(request, department);
+
+        Employee saved = employeeRepository.save(employee);
+
+        log.info("Employee created with id {}", saved.getId());
+
+        return mapper.toResponse(saved);
     }
 
     @Transactional
     public EmployeeResponse update(Long id, EmployeeRequest request) {
-        log.info("Updating employee with id: {}", id);
-        Employee employee = employeeRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Employee", id));
 
-        if (!employee.getEmail().equals(request.getEmail()) && employeeRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("Employee with email " + request.getEmail() + " already exists");
+        Employee employee = getEmployeeOrThrow(id);
+
+        if (!employee.getEmail().equals(request.getEmail()) &&
+                employeeRepository.existsByEmail(request.getEmail())) {
+
+            throw new IllegalArgumentException(
+                    "Employee with email " + request.getEmail() + " already exists");
         }
 
-        Department department = departmentRepository.findById(request.getDepartmentId())
-                .orElseThrow(() -> new ResourceNotFoundException("Department", request.getDepartmentId()));
+        Department department = getDepartmentOrThrow(request.getDepartmentId());
 
         employee.setName(request.getName());
         employee.setEmail(request.getEmail());
@@ -82,30 +78,26 @@ public class EmployeeService {
         employee.setHireDate(request.getHireDate());
         employee.setDepartment(department);
 
-        EmployeeResponse response = toResponse(employeeRepository.save(employee));
-        log.info("Updated employee with id: {}", id);
-        return response;
+        Employee updatedEmployee = employeeRepository.save(employee);
+
+        log.info("Employee {} updated", id);
+
+        return mapper.toResponse(updatedEmployee);
     }
 
     @Transactional
     public void delete(Long id) {
-        log.info("Deleting employee with id: {}", id);
-        if (!employeeRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Employee", id);
-        }
-        employeeRepository.deleteById(id);
-        log.info("Deleted employee with id: {}", id);
+        Employee employee = getEmployeeOrThrow(id);
+        employeeRepository.delete(employee);
     }
 
-    private EmployeeResponse toResponse(Employee employee) {
-        return EmployeeResponse.builder()
-                .id(employee.getId())
-                .name(employee.getName())
-                .email(employee.getEmail())
-                .salary(employee.getSalary())
-                .hireDate(employee.getHireDate())
-                .departmentId(employee.getDepartment().getId())
-                .departmentName(employee.getDepartment().getName())
-                .build();
+    private Employee getEmployeeOrThrow(Long id) {
+        return employeeRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Employee", id));
+    }
+
+    private Department getDepartmentOrThrow(Long departmentId) {
+        return departmentRepository.findById(departmentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Department", departmentId));
     }
 }

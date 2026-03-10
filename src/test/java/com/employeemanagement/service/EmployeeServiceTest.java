@@ -32,15 +32,20 @@ class EmployeeServiceTest {
     @Mock
     private DepartmentRepository departmentRepository;
 
+    @Mock
+    private EmployeeMapper mapper;
+
     @InjectMocks
     private EmployeeService employeeService;
 
     private Department department;
     private Employee employee;
     private EmployeeRequest employeeRequest;
+    private EmployeeResponse employeeResponse;
 
     @BeforeEach
     void setUp() {
+
         department = Department.builder()
                 .id(1L)
                 .name("Engineering")
@@ -63,87 +68,128 @@ class EmployeeServiceTest {
                 .hireDate(LocalDate.of(2020, 1, 15))
                 .departmentId(1L)
                 .build();
+
+        employeeResponse = EmployeeResponse.builder()
+                .id(1L)
+                .name("John Doe")
+                .email("john.doe@company.com")
+                .salary(BigDecimal.valueOf(75000))
+                .hireDate(LocalDate.of(2020, 1, 15))
+                .departmentId(1L)
+                .departmentName("Engineering")
+                .build();
     }
 
     @Test
     void findAll_shouldReturnAllEmployees() {
+
         when(employeeRepository.findAll()).thenReturn(List.of(employee));
+        when(mapper.toResponse(employee)).thenReturn(employeeResponse);
 
         List<EmployeeResponse> result = employeeService.findAll();
 
         assertNotNull(result);
         assertEquals(1, result.size());
         assertEquals("John Doe", result.get(0).getName());
-        assertEquals("john.doe@company.com", result.get(0).getEmail());
-        verify(employeeRepository, times(1)).findAll();
+
+        verify(employeeRepository).findAll();
     }
 
     @Test
     void findById_whenEmployeeExists_shouldReturnEmployee() {
+
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
+        when(mapper.toResponse(employee)).thenReturn(employeeResponse);
 
         EmployeeResponse result = employeeService.findById(1L);
 
         assertNotNull(result);
         assertEquals(1L, result.getId());
-        assertEquals("John Doe", result.getName());
         assertEquals("Engineering", result.getDepartmentName());
-        verify(employeeRepository, times(1)).findById(1L);
+
+        verify(employeeRepository).findById(1L);
     }
 
     @Test
-    void findById_whenEmployeeNotFound_shouldThrowResourceNotFoundException() {
+    void findById_whenEmployeeNotFound_shouldThrowException() {
+
         when(employeeRepository.findById(999L)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> employeeService.findById(999L));
-        verify(employeeRepository, times(1)).findById(999L);
+        assertThrows(ResourceNotFoundException.class,
+                () -> employeeService.findById(999L));
+
+        verify(employeeRepository).findById(999L);
     }
 
     @Test
-    void create_shouldSaveAndReturnEmployee() {
-        when(employeeRepository.existsByEmail(employeeRequest.getEmail())).thenReturn(false);
-        when(departmentRepository.findById(1L)).thenReturn(Optional.of(department));
-        when(employeeRepository.save(any(Employee.class))).thenReturn(employee);
+    void create_shouldSaveEmployee() {
+
+        when(employeeRepository.findByEmail(employeeRequest.getEmail()))
+                .thenReturn(Optional.empty());
+
+        when(departmentRepository.findById(1L))
+                .thenReturn(Optional.of(department));
+
+        when(mapper.toEntity(employeeRequest, department))
+                .thenReturn(employee);
+
+        when(employeeRepository.save(employee))
+                .thenReturn(employee);
+
+        when(mapper.toResponse(employee))
+                .thenReturn(employeeResponse);
 
         EmployeeResponse result = employeeService.create(employeeRequest);
 
         assertNotNull(result);
         assertEquals("John Doe", result.getName());
-        assertEquals("john.doe@company.com", result.getEmail());
-        verify(employeeRepository, times(1)).save(any(Employee.class));
+
+        verify(employeeRepository).save(employee);
     }
 
     @Test
     void create_whenEmailExists_shouldThrowException() {
-        when(employeeRepository.existsByEmail(employeeRequest.getEmail())).thenReturn(true);
 
-        assertThrows(IllegalArgumentException.class, () -> employeeService.create(employeeRequest));
-        verify(employeeRepository, never()).save(any(Employee.class));
+        when(employeeRepository.findByEmail(employeeRequest.getEmail()))
+                .thenReturn(Optional.of(employee));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> employeeService.create(employeeRequest));
+
+        verify(employeeRepository, never()).save(any());
     }
 
     @Test
-    void update_whenEmployeeNotFound_shouldThrowResourceNotFoundException() {
+    void update_whenEmployeeNotFound_shouldThrowException() {
+
         when(employeeRepository.findById(999L)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> employeeService.update(999L, employeeRequest));
-        verify(employeeRepository, never()).save(any(Employee.class));
+        assertThrows(ResourceNotFoundException.class,
+                () -> employeeService.update(999L, employeeRequest));
+
+        verify(employeeRepository, never()).save(any());
     }
 
     @Test
     void delete_shouldDeleteEmployee() {
-        when(employeeRepository.existsById(1L)).thenReturn(true);
-        doNothing().when(employeeRepository).deleteById(1L);
+
+        when(employeeRepository.findById(1L))
+                .thenReturn(Optional.of(employee));
 
         employeeService.delete(1L);
 
-        verify(employeeRepository, times(1)).deleteById(1L);
+        verify(employeeRepository).delete(employee);
     }
 
     @Test
-    void delete_whenEmployeeNotFound_shouldThrowResourceNotFoundException() {
-        when(employeeRepository.existsById(999L)).thenReturn(false);
+    void delete_whenEmployeeNotFound_shouldThrowException() {
 
-        assertThrows(ResourceNotFoundException.class, () -> employeeService.delete(999L));
-        verify(employeeRepository, never()).deleteById(anyLong());
+        when(employeeRepository.findById(999L))
+                .thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class,
+                () -> employeeService.delete(999L));
+
+        verify(employeeRepository, never()).delete(any());
     }
 }
