@@ -21,6 +21,10 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @WebMvcTest(DepartmentController.class)
 @Import(GlobalExceptionHandler.class)
@@ -37,21 +41,27 @@ class DepartmentControllerTest {
 
     @Test
     void getAllDepartments_shouldReturn200() throws Exception {
+
         DepartmentResponse response = DepartmentResponse.builder()
                 .id(1L)
                 .name("Engineering")
                 .location("Building A")
                 .build();
 
-        when(departmentService.findAll()).thenReturn(List.of(response));
+        Page<DepartmentResponse> page = new PageImpl<>(List.of(response));
 
-        mockMvc.perform(get("/api/v1/departments"))
+        when(departmentService.findAll(any(Pageable.class))).thenReturn(page);
+
+        mockMvc.perform(get("/api/v1/departments")
+                        .param("page", "0")
+                        .param("size", "10")
+                        .param("sort", "id,asc"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].name", is("Engineering")))
-                .andExpect(jsonPath("$[0].location", is("Building A")));
+                .andExpect(jsonPath("$.content", hasSize(1)))
+                .andExpect(jsonPath("$.content[0].name", is("Engineering")))
+                .andExpect(jsonPath("$.content[0].location", is("Building A")));
 
-        verify(departmentService, times(1)).findAll();
+        verify(departmentService, times(1)).findAll(any(Pageable.class));
     }
 
     @Test

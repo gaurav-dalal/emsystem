@@ -23,6 +23,10 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @WebMvcTest(EmployeeController.class)
 @Import(GlobalExceptionHandler.class)
@@ -39,6 +43,7 @@ class EmployeeControllerTest {
 
     @Test
     void getAllEmployees_shouldReturn200() throws Exception {
+
         EmployeeResponse response = EmployeeResponse.builder()
                 .id(1L)
                 .name("John Doe")
@@ -47,15 +52,20 @@ class EmployeeControllerTest {
                 .departmentName("Engineering")
                 .build();
 
-        when(employeeService.findAll()).thenReturn(List.of(response));
+        Page<EmployeeResponse> page = new PageImpl<>(List.of(response));
 
-        mockMvc.perform(get("/api/v1/employees"))
+        when(employeeService.findAll(any(Pageable.class))).thenReturn(page);
+
+        mockMvc.perform(get("/api/v1/employees")
+                        .param("page", "0")
+                        .param("size", "10")
+                        .param("sort", "id,asc"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].name", is("John Doe")))
-                .andExpect(jsonPath("$[0].email", is("john@company.com")));
+                .andExpect(jsonPath("$.content", hasSize(1)))
+                .andExpect(jsonPath("$.content[0].name", is("John Doe")))
+                .andExpect(jsonPath("$.content[0].email", is("john@company.com")));
 
-        verify(employeeService, times(1)).findAll();
+        verify(employeeService, times(1)).findAll(any(Pageable.class));
     }
 
     @Test

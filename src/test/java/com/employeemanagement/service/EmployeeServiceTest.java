@@ -13,6 +13,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -81,18 +85,20 @@ class EmployeeServiceTest {
     }
 
     @Test
-    void findAll_shouldReturnAllEmployees() {
+    void findAll_shouldReturnAllEmployeesWithPagination() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Employee> employeePage = new PageImpl<>(List.of(employee));
 
-        when(employeeRepository.findAll()).thenReturn(List.of(employee));
+        when(employeeRepository.findAll(pageable)).thenReturn(employeePage);
         when(mapper.toResponse(employee)).thenReturn(employeeResponse);
 
-        List<EmployeeResponse> result = employeeService.findAll();
+        Page<EmployeeResponse> result = employeeService.findAll(pageable);
 
         assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals("John Doe", result.get(0).getName());
+        assertEquals(1, result.getContent().size());
+        assertEquals("John Doe", result.getContent().get(0).getName());
 
-        verify(employeeRepository).findAll();
+        verify(employeeRepository).findAll(pageable);
     }
 
     @Test

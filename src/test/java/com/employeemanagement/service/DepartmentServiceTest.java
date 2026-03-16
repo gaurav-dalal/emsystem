@@ -17,6 +17,10 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
 class DepartmentServiceTest {
@@ -58,16 +62,19 @@ class DepartmentServiceTest {
     @Test
     void findAll_shouldReturnAllDepartments() {
 
-        when(departmentRepository.findAll()).thenReturn(List.of(department));
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Department> departmentPage = new PageImpl<>(List.of(department));
+
+        when(departmentRepository.findAll(pageable)).thenReturn(departmentPage);
         when(mapper.toResponse(department)).thenReturn(departmentResponse);
 
-        List<DepartmentResponse> result = departmentService.findAll();
+        Page<DepartmentResponse> result = departmentService.findAll(pageable);
 
         assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals("Engineering", result.get(0).getName());
+        assertEquals(1, result.getContent().size());
+        assertEquals("Engineering", result.getContent().get(0).getName());
 
-        verify(departmentRepository).findAll();
+        verify(departmentRepository).findAll(pageable);
     }
 
     @Test
