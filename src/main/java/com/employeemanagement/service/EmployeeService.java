@@ -9,10 +9,13 @@ import com.employeemanagement.repository.DepartmentRepository;
 import com.employeemanagement.repository.EmployeeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 
 @Service
 @RequiredArgsConstructor
@@ -24,17 +27,17 @@ public class EmployeeService {
     private final EmployeeMapper mapper;
 
     @Transactional(readOnly = true)
-    public List<EmployeeResponse> findAll() {
-        log.info(" inside FindALl ");
-        return employeeRepository.findAll()
-                .stream()
-                .map(mapper::toResponse)
-                .toList();
+    public Page<EmployeeResponse> findAll(Pageable pageable) {
+        log.info(" inside FindAll with pagination ");
+        return employeeRepository.findAll(pageable)
+                .map(mapper::toResponse);
     }
 
+    @Cacheable(value = "employees", key = "#id")
     @Transactional(readOnly = true)
     public EmployeeResponse findById(Long id) {
         log.info(" inside find by id ------------- ");
+        log.info("Fetching employee from DB with id {}", id);
         Employee employee = getEmployeeOrThrow(id);
         return mapper.toResponse(employee);
     }
@@ -58,6 +61,7 @@ public class EmployeeService {
         return mapper.toResponse(saved);
     }
 
+    @CacheEvict(value = "employees", key = "#id")
     @Transactional
     public EmployeeResponse update(Long id, EmployeeRequest request) {
 
@@ -85,6 +89,7 @@ public class EmployeeService {
         return mapper.toResponse(updatedEmployee);
     }
 
+    @CacheEvict(value = "employees", key = "#id")
     @Transactional
     public void delete(Long id) {
         Employee employee = getEmployeeOrThrow(id);

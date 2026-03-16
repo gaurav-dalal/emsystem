@@ -10,6 +10,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+
 import java.util.List;
 
 @RestController
@@ -22,9 +26,10 @@ public class DepartmentController {
     private final DepartmentService departmentService;
 
     @GetMapping
-    public ResponseEntity<List<DepartmentResponse>> getAllDepartments() {
+    public ResponseEntity<Page<DepartmentResponse>> getAllDepartments(
+            @PageableDefault(size = 10, sort = "id") Pageable pageable ) {
 
-        return ResponseEntity.ok(departmentService.findAll());
+        return ResponseEntity.ok(departmentService.findAll(pageable));
     }
 
     @GetMapping("/{id}")

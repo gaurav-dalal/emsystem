@@ -31,12 +31,12 @@ public class DataLoader {
     private final ProjectRepository projectRepository;
     private final EmployeeProjectRepository employeeProjectRepository;
 
-    private static final String[] FIRST_NAMES = {"Gaurav", "Sukumar", "Srinivas", "Mohit", "Jaya", "Jennifer",
-            "Jamila", "Poorva", "Sayma", "Rahul", "Koel", "BalaKumar", "Yash", "Krishna", "Jaykumar", "Jessica",
-            "Praveen", "Sarah", "Charles", "Karen", "Christopher", "Nancy", "Daniel", "Lisa", "Shanta", "Arjun",
-            "Anthony", "Sanju", "Surya", "Kumaran", "Donald", "Raghu", "Steven", "Kimberly", "Paul", "Emily"};
+    private static final String[] FIRST_NAMES = {"Gaurav", "Sukumar", "Srinivas", "Mohit", "Jaya", "Seema",
+            "Jamila", "Poorva", "Sayma", "Rahul", "Koel", "BalaKumar", "Yash", "Krishna", "Jaykumar", "July",
+            "Praveen", "Sarah", "Charles", "Karen", "Ramesh", "Nancy", "Vinod", "Gayatari", "Shanta", "Arjun",
+            "Reetu", "Sanju", "Surya", "Kumaran", "Donald", "Raghu", "Steven", "Kimberly", "Prakash", "Anju"};
 
-    private static final String[] LAST_NAMES = {"Babu Rao", "Sharma", "Kohli", "Shashtri", "Dhillon", "Singh",
+    private static final String[] LAST_NAMES = {"Narkanda", "Sharma", "Kohli", "Shashtri", "Dhillon", "Singh",
             "Trivedi", "Bumrah", "Sindhu", "Samson", "Bhaskaran", "Patel", "Patil", "Dwiwedi", "Nagaraj",
             "Sinh", "Jurel", "Divekar", "Agarkar", "Tyagi", "Thalapathy", "Walia", "Jain", "Agarwal", "Agnihotri"};
 
@@ -73,6 +73,23 @@ public class DataLoader {
                 Department.builder().name("Agentic AI").location("Hyderabad").build(),
                 Department.builder().name("Gen AI").location("Gurgaon").build(),
                 Department.builder().name("Sales").location("Chennai").build(),
+                Department.builder().name("Application Platform").location("Kolkata").build(),
+                Department.builder().name("Data Science").location("Pune").build(),
+                Department.builder().name("ML").location("Hyderabad").build(),
+                Department.builder().name("BigQuery").location("Gurgaon").build(),
+                Department.builder().name("DataAnalyst").location("Chennai").build(),
+
+                Department.builder().name("New Agentic AI 4").location("Kolkata").build(),
+                Department.builder().name("PackagedApp Dev").location("Pune").build(),
+                Department.builder().name("Operations").location("Hyderabad").build(),
+                Department.builder().name("Super AI").location("Gurgaon").build(),
+                Department.builder().name("AI Programming").location("Chennai").build(),
+                Department.builder().name("App Gen AI Python").location("Kolkata").build(),
+                Department.builder().name("DSA").location("Pune").build(),
+                Department.builder().name("Delivery").location("Hyderabad").build(),
+                Department.builder().name("Hadoop").location("Gurgaon").build(),
+                Department.builder().name("DataAnalyst").location("Chennai").build(),
+
                 Department.builder().name("Operation Support").location("Bengaluru").build()
         );
     }

@@ -11,7 +11,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import java.util.List;
 
 @Service
@@ -23,12 +26,10 @@ public class DepartmentService {
     private final DepartmentMapper mapper;
 
     @Transactional(readOnly = true)
-    public List<DepartmentResponse> findAll() {
-
-        return departmentRepository.findAll()
-                .stream()
-                .map(mapper::toResponse)
-                .toList();
+    public Page<DepartmentResponse> findAll(Pageable pageable) {
+        log.info(" inside FindAll with pagination ");
+        return departmentRepository.findAll(pageable)
+                .map(mapper::toResponse);
     }
 
     @Transactional(readOnly = true)
