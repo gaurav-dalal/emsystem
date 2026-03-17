@@ -26,6 +26,7 @@ public class EmployeeService {
     private final DepartmentRepository departmentRepository;
     private final EmployeeMapper mapper;
 
+
     @Transactional(readOnly = true)
     public Page<EmployeeResponse> findAll(Pageable pageable) {
         log.info(" inside FindAll with pagination ");

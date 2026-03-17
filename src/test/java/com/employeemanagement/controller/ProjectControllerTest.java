@@ -10,6 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -37,6 +40,7 @@ class ProjectControllerTest {
 
     @Test
     void getAllProjects_shouldReturn200() throws Exception {
+
         ProjectResponse response = ProjectResponse.builder()
                 .id(1L)
                 .name("Project Alpha")
@@ -45,15 +49,20 @@ class ProjectControllerTest {
                 .departmentName("Engineering")
                 .build();
 
-        when(projectService.findAll()).thenReturn(List.of(response));
+        Page<ProjectResponse> page = new PageImpl<>(List.of(response));
 
-        mockMvc.perform(get("/api/v1/projects"))
+        when(projectService.findAll(any(Pageable.class))).thenReturn(page);
+
+        mockMvc.perform(get("/api/v1/projects")
+                        .param("page", "0")
+                        .param("size", "10")
+                        .param("sort", "id,asc"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].name", is("Project Alpha")))
-                .andExpect(jsonPath("$[0].description", is("First project")));
+                .andExpect(jsonPath("$.content", hasSize(1)))
+                .andExpect(jsonPath("$.content[0].name", is("Project Alpha")))
+                .andExpect(jsonPath("$.content[0].description", is("First project")));
 
-        verify(projectService, times(1)).findAll();
+        verify(projectService, times(1)).findAll(any(Pageable.class));
     }
 
     @Test

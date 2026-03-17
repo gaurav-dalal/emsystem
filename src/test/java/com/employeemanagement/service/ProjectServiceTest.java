@@ -3,6 +3,7 @@ package com.employeemanagement.service;
 import com.employeemanagement.dto.request.ProjectRequest;
 import com.employeemanagement.dto.response.ProjectResponse;
 import com.employeemanagement.entity.Department;
+import com.employeemanagement.entity.Employee;
 import com.employeemanagement.entity.Project;
 import com.employeemanagement.exception.ResourceNotFoundException;
 import com.employeemanagement.repository.DepartmentRepository;
@@ -13,6 +14,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -48,13 +53,13 @@ class ProjectServiceTest {
 
         project = Project.builder()
                 .id(1L)
-                .name("Project Alpha")
+                .name("CVS")
                 .description("Core platform")
                 .department(department)
                 .build();
 
         projectRequest = ProjectRequest.builder()
-                .name("Project Alpha")
+                .name("CVS")
                 .description("Core platform")
                 .departmentId(1L)
                 .build();
@@ -78,15 +83,18 @@ class ProjectServiceTest {
 
 
     @Test
-    void findAll_shouldReturnAllProjects() {
+    void findAll_shouldReturnAllProjectsWithPagination() {
+        Pageable pageable = PageRequest.of(0, 10);
 
-        when(projectRepository.findAll()).thenReturn(List.of(project));
-        List<ProjectResponse> result = projectService.findAll();
+        Page<Project> projectPage = new PageImpl<>(List.of(project));
+        when(projectRepository.findAll(pageable)).thenReturn(projectPage);
+
+        Page<ProjectResponse> result = projectService.findAll(pageable);
         assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals("Project Alpha", result.get(0).getName());
+        assertEquals(1, result.getContent().size());
+        assertEquals("CVS", result.getContent().get(0).getName());
 
-        verify(projectRepository).findAll();
+        verify(projectRepository).findAll(pageable);
     }
 
     @Test
@@ -96,7 +104,7 @@ class ProjectServiceTest {
         ProjectResponse result = projectService.findById(1L);
         assertNotNull(result);
         assertEquals(1L, result.getId());
-        assertEquals("Project Alpha", result.getName());
+        assertEquals("CVS", result.getName());
 
         verify(projectRepository).findById(1L);
     }
@@ -116,7 +124,7 @@ class ProjectServiceTest {
         mockProjectSave();
         ProjectResponse result = projectService.create(projectRequest);
         assertNotNull(result);
-        assertEquals("Project Alpha", result.getName());
+        assertEquals("CVS", result.getName());
 
         verify(projectRepository).save(any(Project.class));
     }
@@ -129,7 +137,7 @@ class ProjectServiceTest {
         mockProjectSave();
         ProjectResponse result = projectService.update(1L, projectRequest);
         assertNotNull(result);
-        assertEquals("Project Alpha", result.getName());
+        assertEquals("CVS", result.getName());
 
         verify(projectRepository).save(any(Project.class));
     }

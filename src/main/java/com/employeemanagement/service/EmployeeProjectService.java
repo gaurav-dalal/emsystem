@@ -11,6 +11,10 @@ import com.employeemanagement.repository.EmployeeRepository;
 import com.employeemanagement.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,11 +31,12 @@ public class EmployeeProjectService {
     private final ProjectRepository projectRepository;
 
     @Transactional(readOnly = true)
-    public List<EmployeeProjectResponse> findAll() {
-        return employeeProjectRepository.findAll().stream()
-                .map(this::toResponse).toList();
+    public Page<EmployeeProjectResponse> findAll(Pageable pageable) {
+        return employeeProjectRepository.findAll(pageable)
+                .map(this::toResponse);
     }
 
+    @Cacheable(value = "employeeproject", key = "#id")
     @Transactional(readOnly = true)
     public EmployeeProjectResponse findById(Long id) {
         EmployeeProject ep = getAssignmentOrThrow(id);
@@ -57,6 +62,7 @@ public class EmployeeProjectService {
         return response;
     }
 
+    @CacheEvict(value = "employeeproject", key = "#id")
     @Transactional
     public EmployeeProjectResponse update(Long id, EmployeeProjectRequest request) {
         log.info("Updating assignment with id: {}", id);
@@ -77,6 +83,7 @@ public class EmployeeProjectService {
         return response;
     }
 
+    @CacheEvict(value = "employeeproject", key = "#id")
     @Transactional
     public void delete(Long id) {
         log.info("Deleting assignment with id: {}", id);

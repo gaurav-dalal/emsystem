@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -58,16 +57,16 @@ class EmployeeServiceTest {
 
         employee = Employee.builder()
                 .id(1L)
-                .name("John Doe")
-                .email("john.doe@company.com")
+                .name("Gaurav Dalal")
+                .email("gaurav.dalal@xenture.com")
                 .salary(BigDecimal.valueOf(75000))
                 .hireDate(LocalDate.of(2020, 1, 15))
                 .department(department)
                 .build();
 
         employeeRequest = EmployeeRequest.builder()
-                .name("John Doe")
-                .email("john.doe@company.com")
+                .name("Virat Kohli")
+                .email("kohli@company.com")
                 .salary(BigDecimal.valueOf(75000))
                 .hireDate(LocalDate.of(2020, 1, 15))
                 .departmentId(1L)
@@ -75,8 +74,8 @@ class EmployeeServiceTest {
 
         employeeResponse = EmployeeResponse.builder()
                 .id(1L)
-                .name("John Doe")
-                .email("john.doe@company.com")
+                .name("Rohit Sharma")
+                .email("rohit@company.com")
                 .salary(BigDecimal.valueOf(75000))
                 .hireDate(LocalDate.of(2020, 1, 15))
                 .departmentId(1L)
@@ -86,6 +85,7 @@ class EmployeeServiceTest {
 
     @Test
     void findAll_shouldReturnAllEmployeesWithPagination() {
+
         Pageable pageable = PageRequest.of(0, 10);
         Page<Employee> employeePage = new PageImpl<>(List.of(employee));
 
@@ -96,7 +96,7 @@ class EmployeeServiceTest {
 
         assertNotNull(result);
         assertEquals(1, result.getContent().size());
-        assertEquals("John Doe", result.getContent().get(0).getName());
+        assertEquals("Rohit Sharma", result.getContent().get(0).getName());
 
         verify(employeeRepository).findAll(pageable);
     }
@@ -148,7 +148,7 @@ class EmployeeServiceTest {
         EmployeeResponse result = employeeService.create(employeeRequest);
 
         assertNotNull(result);
-        assertEquals("John Doe", result.getName());
+        assertEquals("Rohit Sharma", result.getName());
 
         verify(employeeRepository).save(employee);
     }

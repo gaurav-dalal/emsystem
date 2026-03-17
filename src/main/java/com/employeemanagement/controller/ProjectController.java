@@ -6,6 +6,9 @@ import com.employeemanagement.service.ProjectService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,9 +25,10 @@ public class ProjectController {
     private final ProjectService projectService;
 
     @GetMapping
-    public ResponseEntity<List<ProjectResponse>> getAllProjects() {
+    public ResponseEntity<Page<ProjectResponse>> getAllProjects(
+            @PageableDefault(size = 10, sort = "id") Pageable pageable    ) {
 
-        return ResponseEntity.ok(projectService.findAll());
+        return ResponseEntity.ok(projectService.findAll(pageable));
     }
 
     @GetMapping("/{id}")

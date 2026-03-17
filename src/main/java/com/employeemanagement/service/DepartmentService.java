@@ -9,6 +9,8 @@ import com.employeemanagement.exception.ResourceNotFoundException;
 import com.employeemanagement.repository.DepartmentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -32,6 +34,7 @@ public class DepartmentService {
                 .map(mapper::toResponse);
     }
 
+    @Cacheable(value = "departments", key = "#id")
     @Transactional(readOnly = true)
     public DepartmentResponse findById(Long id) {
         Department department = getDepartmentOrThrow(id);
@@ -50,6 +53,7 @@ public class DepartmentService {
         return mapper.toResponse(savedDepartment);
     }
 
+    @CacheEvict(value = "departments", key = "#id")
     @Transactional
     public DepartmentResponse update(Long id, DepartmentRequest request) {
         Department department = getDepartmentOrThrow(id);
@@ -60,7 +64,7 @@ public class DepartmentService {
 
         return mapper.toResponse(updatedDepartment);
     }
-
+    @CacheEvict(value = "departments", key = "#id")
     @Transactional
     public void delete(Long id) {
         Department department = getDepartmentOrThrow(id);

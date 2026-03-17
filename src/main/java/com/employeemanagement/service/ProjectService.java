@@ -9,6 +9,10 @@ import com.employeemanagement.repository.DepartmentRepository;
 import com.employeemanagement.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,14 +28,13 @@ public class ProjectService {
     private final DepartmentRepository departmentRepository;
 
     @Transactional(readOnly = true)
-    public List<ProjectResponse> findAll() {
-
-        return projectRepository.findAll()
-                .stream()
-                .map(this::toResponse)
-                .toList();
+    public Page<ProjectResponse> findAll(Pageable pageable) {
+        log.info(" inside findAll projects with pagination ");
+        return projectRepository.findAll(pageable)
+                .map(this::toResponse);
     }
 
+    @Cacheable(value = "projects", key = "#id")
     @Transactional(readOnly = true)
     public ProjectResponse findById(Long id) {
 
@@ -56,6 +59,7 @@ public class ProjectService {
         return toResponse(projectRepository.save(project));
     }
 
+    @CacheEvict(value = "projects", key = "#id")
     @Transactional
     public ProjectResponse update(Long id, ProjectRequest request) {
         log.info("Updating project with id: {}", id);
@@ -74,6 +78,7 @@ public class ProjectService {
         return response;
     }
 
+    @CacheEvict(value = "projects", key = "#id")
     @Transactional
     public void delete(Long id) {
         log.info("Deleting project with id: {}", id);

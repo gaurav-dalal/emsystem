@@ -6,6 +6,9 @@ import com.employeemanagement.service.EmployeeProjectService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,8 +25,9 @@ public class EmployeeProjectController {
     private final EmployeeProjectService employeeProjectService;
 
     @GetMapping
-    public ResponseEntity<List<EmployeeProjectResponse>> getAllAssignments() {
-        return ResponseEntity.ok(employeeProjectService.findAll());
+    public ResponseEntity<Page<EmployeeProjectResponse>> getAllAssignments(
+            @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+        return ResponseEntity.ok(employeeProjectService.findAll(pageable));
     }
 
     @GetMapping("/{id}")

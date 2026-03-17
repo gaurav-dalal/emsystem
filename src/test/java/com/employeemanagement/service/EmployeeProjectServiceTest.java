@@ -16,6 +16,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -49,8 +53,8 @@ class EmployeeProjectServiceTest {
     @BeforeEach
     void setUp() {
         department = Department.builder().id(1L).name("Engineering").build();
-        employee = Employee.builder().id(1L).name("John Doe").department(department).build();
-        project = Project.builder().id(1L).name("Project Alpha").department(department).build();
+        employee = Employee.builder().id(1L).name("Gaurav Dalal").department(department).build();
+        project = Project.builder().id(1L).name("CCVVMM").department(department).build();
 
         employeeProject = EmployeeProject.builder()
                 .id(1L)
@@ -69,16 +73,21 @@ class EmployeeProjectServiceTest {
     }
 
     @Test
-    void findAll_shouldReturnAllAssignments() {
-        when(employeeProjectRepository.findAll()).thenReturn(List.of(employeeProject));
+    void findAll_shouldReturnAllAssignmentsWithPagination() {
 
-        List<EmployeeProjectResponse> result = employeeProjectService.findAll();
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<EmployeeProject> employeePage = new PageImpl<>(List.of(employeeProject));
+
+        when(employeeProjectRepository.findAll(pageable)).thenReturn(employeePage);
+
+        Page<EmployeeProjectResponse> result = employeeProjectService.findAll(pageable);
 
         assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals("John Doe", result.get(0).getEmployeeName());
-        assertEquals("Project Alpha", result.get(0).getProjectName());
-        verify(employeeProjectRepository, times(1)).findAll();
+        assertEquals(1, result.getContent().size());
+        assertEquals("Gaurav Dalal", result.getContent().get(0).getEmployeeName());
+        assertEquals("CCVVMM", result.getContent().get(0).getProjectName());
+
+        verify(employeeProjectRepository, times(1)).findAll(pageable);
     }
 
     @Test
