@@ -34,6 +34,17 @@ public class EmployeeService {
                 .map(mapper::toResponse);
     }
 
+    /**
+     * Enables caching for frequently accessed employee  by ID.
+     *
+     * Spring's default in-memory cache (ConcurrentHashMap-based) is used.
+     * on cache hit -> the database call is skipped
+     * on cache miss-> data is fetched from DB and stored in cache for subsequent requests.
+     * Cache eviction/refresh is maintined for Update and Delete operation
+     *
+     * @param id employee identifier
+     * @return EmployeeResponse
+     */
     @Cacheable(value = "employees", key = "#id")
     @Transactional(readOnly = true)
     public EmployeeResponse findById(Long id) {
