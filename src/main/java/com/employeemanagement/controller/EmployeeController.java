@@ -24,6 +24,19 @@ public class EmployeeController {
 
     private final EmployeeService employeeService;
 
+    /**
+     * Retrieves paginated + sorted list of employees
+     * Pagination is handled using {Pageable}
+     * If no query parameters are provided then
+     *      default values will be applied (page=0, size=10, sort=id,asc)
+     *   pagination and sorting can be customized using request parameters
+     *   page - page number (0-based)
+     *  size - number of records per page
+     *  sort - sorting criteria (for ex  sort=name,asc or sort=Id,desc)
+     *
+     * @param pageable
+     * @return
+     */
     @GetMapping
     public ResponseEntity<Page<EmployeeResponse>> getAllEmployees(
             @PageableDefault(size = 10, sort = "id") Pageable pageable) {

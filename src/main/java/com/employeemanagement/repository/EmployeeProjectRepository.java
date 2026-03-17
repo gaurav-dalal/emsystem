@@ -10,6 +10,15 @@ import org.springframework.stereotype.Repository;
 
 public interface EmployeeProjectRepository extends JpaRepository<EmployeeProject, Long> {
 
+    /**
+     *
+     * To solve N+1 Entity Graph is being used
+     * Entity Graph : Whenever fetch Employee ->  also fetch Department in the same query
+     * Entity Graph - allowing Hibernate to fetch related data using a join in a single query
+     *
+     * @param pageable
+     * @return
+     */
     @Override
     @EntityGraph(attributePaths = {"employee", "project"})
     Page<EmployeeProject> findAll(Pageable pageable);

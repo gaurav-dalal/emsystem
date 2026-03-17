@@ -16,7 +16,14 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     boolean existsByEmail(String email);
 
 
-
+    /**
+     *
+     * To solve N+1 Entity Graph is being used
+     * Entity Graph : Whenever fetch Employee ->  also fetch Department in the same query
+     * Entity Graph - allowing Hibernate to fetch related data using a join in a single query
+     * @param pageable
+     * @return
+     */
     @Override
     @EntityGraph(attributePaths = {"department"})
     Page<Employee> findAll(Pageable pageable);
