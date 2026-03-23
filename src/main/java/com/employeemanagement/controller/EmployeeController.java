@@ -3,6 +3,7 @@ package com.employeemanagement.controller;
 import com.employeemanagement.dto.request.EmployeeRequest;
 import com.employeemanagement.dto.response.EmployeeResponse;
 import com.employeemanagement.service.EmployeeService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 @Slf4j
+@Tag(name = "Employee APIs", description = "Operations related to Employees")
 public class EmployeeController {
 
     private final EmployeeService employeeService;

@@ -11,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
@@ -21,6 +22,7 @@ import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import org.springframework.data.domain.Page;
@@ -28,8 +30,10 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+
 @WebMvcTest(EmployeeController.class)
 @Import(GlobalExceptionHandler.class)
+@WithMockUser(username = "admin", roles = {"ADMIN"})
 class EmployeeControllerTest {
 
     @Autowired
@@ -105,6 +109,7 @@ class EmployeeControllerTest {
         when(employeeService.create(any(EmployeeRequest.class))).thenReturn(response);
 
         mockMvc.perform(post("/api/v1/employees")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
@@ -131,6 +136,7 @@ class EmployeeControllerTest {
         when(employeeService.update(eq(1L), any(EmployeeRequest.class))).thenReturn(response);
 
         mockMvc.perform(put("/api/v1/employees/1")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -143,7 +149,9 @@ class EmployeeControllerTest {
     void deleteEmployee_shouldReturn204() throws Exception {
         doNothing().when(employeeService).delete(1L);
 
-        mockMvc.perform(delete("/api/v1/employees/1"))
+        mockMvc.perform(delete("/api/v1/employees/1")
+                        .with(csrf()))
+
                 .andExpect(status().isNoContent());
 
         verify(employeeService, times(1)).delete(1L);

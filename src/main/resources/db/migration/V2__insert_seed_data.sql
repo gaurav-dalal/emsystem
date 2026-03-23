@@ -12,7 +12,7 @@ INSERT INTO departments (id, name, location) VALUES (11, 'RAG', 'Gurgaon');
 INSERT INTO departments (id, name, location) VALUES (12, 'LangChain', 'Bengaluru');
 
 
--- ================= ADDITIONAL PROJECTS =================
+-- for inseting PROJECTS
 
 INSERT INTO projects (id, name, description, department_id) VALUES (4, 'CVS', 'Healthcare platform', 1);
 INSERT INTO projects (id, name, description, department_id) VALUES (5, 'Best Buy', 'E-commerce platform', 1);
@@ -24,6 +24,8 @@ INSERT INTO projects (id, name, description, department_id) VALUES (10, 'Agentic
 INSERT INTO projects (id, name, description, department_id) VALUES (11, 'Operations Dashboard', 'Ops monitoring', 7);
 INSERT INTO projects (id, name, description, department_id) VALUES (12, 'ML Pipeline 2.0', 'Next-gen ML pipelines', 8);
 
+
+-- for adding Employees
 INSERT INTO employees (name, email, salary, hire_date, department_id)
 VALUES ('Gaurav Dalal', 'gaurav@xenture.com', 990000, '2022-01-01', 1);
 
@@ -103,12 +105,66 @@ INSERT INTO employees (name, email, salary, hire_date, department_id)
 VALUES ('vashitha Kohli', 'vashitha@xenture.com', 410000, '2022-01-01', 1);
 INSERT INTO employees (name, email, salary, hire_date, department_id)
 VALUES ('sujeeth', 'sujeeth@xenture.com', 35000, '2021-05-10', 2);
---32
+
+INSERT INTO employees (name, email, salary, hire_date, department_id)
+VALUES ( 'Apurvva paul', 'apurva@xenture.com', 490000, '2021-05-10', 2);
+INSERT INTO employees (name, email, salary, hire_date, department_id)
+VALUES ( 'Ashwini saharan', 'ashwini@xenture.com', 690000, '2022-01-01', 1);
+INSERT INTO employees (name, email, salary, hire_date, department_id)
+VALUES ( 'Jyotika yallanka', 'Jyotika@xenture.com', 35000, '2021-05-10', 2);
+
+INSERT INTO employees (name, email, salary, hire_date, department_id)
+VALUES ( 'Tanvi', 'tanvi@xenture.com', 430000, '2022-01-01', 1);
+
+INSERT INTO employees (name, email, salary, hire_date, department_id)
+VALUES ( 'Simran sharma', 'simran@xenture.com', 670000, '2021-05-10', 2);
+INSERT INTO employees (name, email, salary, hire_date, department_id)
+VALUES ( 'Dhivya Kohli', 'dhivya@xenture.com', 55000, '2022-01-01', 1);
+INSERT INTO employees (name, email, salary, hire_date, department_id)
+VALUES ( 'Himanshu', 'himanshu@xenture.com', 35000, '2021-05-10', 2);
+
+INSERT INTO employees (name, email, salary, hire_date, department_id)
+VALUES ( 'N Sakthivel', 'sakthivel@xenture.com', 270000, '2022-01-01', 1);
+
+INSERT INTO employees (name, email, salary, hire_date, department_id)
+VALUES ('Venketesh reddy', 'venketesh@xenture.com', 230000, '2021-05-10', 2);
+INSERT INTO employees (name, email, salary, hire_date, department_id)
+VALUES ('SathishKumar Ranganathan', 'SathishKumar@xenture.com', 410000, '2022-01-01', 1);
+INSERT INTO employees (name, email, salary, hire_date, department_id)
+VALUES ('RajeshGurav', 'rajeshgurav@xenture.com', 35000, '2021-05-10', 2);
+
+INSERT INTO employees (name, email, salary, hire_date, department_id)
+VALUES ( 'Nibedita Das', 'nibedita@xenture.com', 230000, '2021-05-10', 2);
+INSERT INTO employees (name, email, salary, hire_date, department_id)
+VALUES ( 'Ramakrishna', 'ramakrishna@xenture.com', 410000, '2022-01-01', 1);
+INSERT INTO employees (name, email, salary, hire_date, department_id)
+VALUES ( 'Rameela Shekhar', 'rameela@xenture.com', 35000, '2021-05-10', 2);
+
+INSERT INTO employees (name, email, salary, hire_date, department_id)
+VALUES ( 'Dalmiya', 'dalmiya@xenture.com', 150000, '2022-01-01', 1);
+
+INSERT INTO employees (name, email, salary, hire_date, department_id)
+VALUES ( 'Sumita sharma', 'sumita@xenture.com', 670000, '2021-05-10', 2);
+INSERT INTO employees (name, email, salary, hire_date, department_id)
+VALUES ( 'Sudhanshu Kohli', 'sudhanshu@xenture.com', 55000, '2022-01-01', 1);
+INSERT INTO employees (name, email, salary, hire_date, department_id)
+VALUES ( 'KrishnaSowjanya', 'krishna.sowjanya@xenture.com', 35000, '2021-05-10', 2);
+
+INSERT INTO employees (name, email, salary, hire_date, department_id)
+VALUES ( 'Pranay saha', 'pranay@xenture.com', 270000, '2022-01-01', 1);
+
+INSERT INTO employees (name, email, salary, hire_date, department_id)
+VALUES ('Muduganuru reddy', 'muduganuru@xenture.com', 230000, '2021-05-10', 2);
+INSERT INTO employees (name, email, salary, hire_date, department_id)
+VALUES ('Manvitha Kohli', 'manvitha@xenture.com', 410000, '2022-01-01', 1);
+INSERT INTO employees (name, email, salary, hire_date, department_id)
+VALUES ('Sravana Sedhari', 'sravana@xenture.com', 35000, '2021-05-10', 2);
 
 
 
 
--- ================= ADDITIONAL EMPLOYEE-PROJECT MAPPINGS =================
+
+-- for adding EMPLOYEE-PROJECT mappings
 
 INSERT INTO employee_projects (employee_id, project_id, assigned_date, role)
 VALUES

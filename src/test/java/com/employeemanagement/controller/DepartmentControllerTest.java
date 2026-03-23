@@ -11,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
@@ -25,9 +26,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 @WebMvcTest(DepartmentController.class)
 @Import(GlobalExceptionHandler.class)
+@WithMockUser(username = "admin", roles = {"ADMIN"})
 class DepartmentControllerTest {
 
     @Autowired
@@ -98,6 +101,7 @@ class DepartmentControllerTest {
         when(departmentService.create(any(DepartmentRequest.class))).thenReturn(response);
 
         mockMvc.perform(post("/api/v1/departments")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
@@ -121,6 +125,7 @@ class DepartmentControllerTest {
         when(departmentService.update(eq(1L), any(DepartmentRequest.class))).thenReturn(response);
 
         mockMvc.perform(put("/api/v1/departments/1")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -133,7 +138,9 @@ class DepartmentControllerTest {
     void deleteDepartment_shouldReturn204() throws Exception {
         doNothing().when(departmentService).delete(1L);
 
-        mockMvc.perform(delete("/api/v1/departments/1"))
+        mockMvc.perform(delete("/api/v1/departments/1")
+                        .with(csrf()))
+
                 .andExpect(status().isNoContent());
 
         verify(departmentService, times(1)).delete(1L);

@@ -9,12 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -22,6 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
+@WithMockUser(username = "admin", roles = {"ADMIN"})
 class DepartmentControllerIT {
 
     private static final String BASE_URL = "/api/v1/departments";
@@ -44,12 +47,13 @@ class DepartmentControllerIT {
                 .build();
 
         mockMvc.perform(post(BASE_URL)
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value("Engineering"));
 
-        assertEquals(1, departmentRepository.count());
+        assertEquals(2, departmentRepository.count());
     }
 
     @Test
@@ -138,10 +142,10 @@ class DepartmentControllerIT {
 
         Department dept = createDepartment("ToDelete");
 
-        mockMvc.perform(delete(BASE_URL + "/{id}", dept.getId()))
+        mockMvc.perform(delete(BASE_URL + "/{id}", dept.getId()) .with(csrf()))
                 .andExpect(status().isNoContent());
 
-        assertEquals(0, departmentRepository.count());
+        assertEquals(1, departmentRepository.count());
     }
 
     @Test

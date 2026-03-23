@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -25,6 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@WithMockUser(username = "admin", roles = {"ADMIN"})
 class EmployeeControllerIT {
 
     @Autowired
@@ -53,8 +55,6 @@ class EmployeeControllerIT {
                         .build()
         );
     }
-
-    // ================= CREATE =================
 
     @Test
     void createEmployee_success() throws Exception {
@@ -99,8 +99,6 @@ class EmployeeControllerIT {
                 .andExpect(status().isBadRequest());
     }
 
-    // ================= GET =================
-
     @Test
     void getEmployeeById_success() throws Exception {
 
@@ -119,8 +117,6 @@ class EmployeeControllerIT {
                 .andExpect(status().isNotFound());
     }
 
-    // ================= PAGINATION =================
-
     @Test
     void getAllEmployees_withPagination() throws Exception {
 
@@ -135,7 +131,6 @@ class EmployeeControllerIT {
                 .andExpect(jsonPath("$.size").value(5));
     }
 
-    // ================= UPDATE =================
 
     @Test
     void updateEmployee_success() throws Exception {
@@ -171,7 +166,7 @@ class EmployeeControllerIT {
                 .andExpect(status().isNotFound());
     }
 
-    // ================= DELETE =================
+
 
     @Test
     void deleteEmployee_success() throws Exception {
@@ -191,7 +186,8 @@ class EmployeeControllerIT {
                 .andExpect(status().isNotFound());
     }
 
-    // ================= HELPER METHODS =================
+
+
 
     private EmployeeRequest buildRequest(String email) {
         return EmployeeRequest.builder()
