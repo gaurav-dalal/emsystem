@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
-//@ActiveProfiles("test")
+@ActiveProfiles("test")
 @WithMockUser(username = "admin", roles = {"ADMIN"})
 public class ProjectControllerIT {
 

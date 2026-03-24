@@ -3,6 +3,7 @@ package com.employeemanagement.controller;
 import com.employeemanagement.dto.request.DepartmentRequest;
 import com.employeemanagement.dto.response.DepartmentResponse;
 import com.employeemanagement.service.DepartmentService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 @Slf4j
+@Tag(name = "Department APIs", description = "CRUD Operations related to Department")
 public class DepartmentController {
 
     private final DepartmentService departmentService;

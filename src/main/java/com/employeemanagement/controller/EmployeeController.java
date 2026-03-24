@@ -3,6 +3,9 @@ package com.employeemanagement.controller;
 import com.employeemanagement.dto.request.EmployeeRequest;
 import com.employeemanagement.dto.response.EmployeeResponse;
 import com.employeemanagement.service.EmployeeService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,14 +17,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/v1/employees")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 @Slf4j
-@Tag(name = "Employee APIs", description = "Operations related to Employees")
+@Tag(name = "Employee APIs", description = "CRUD Operations related to Employees")
 public class EmployeeController {
 
     private final EmployeeService employeeService;
@@ -39,24 +40,49 @@ public class EmployeeController {
      * @param pageable
      * @return
      */
+
+    @Operation(
+            summary = "Get all employees",
+            description = "Fetch paginated and sorted list of employees"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Employees retrieved successfully")
+    })
     @GetMapping
     public ResponseEntity<Page<EmployeeResponse>> getAllEmployees(
             @PageableDefault(size = 10, sort = "id") Pageable pageable) {
         return ResponseEntity.ok(employeeService.findAll(pageable));
     }
 
+    @Operation(summary = "Get employee by ID", description = "Fetch a single employee using its ID")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Employee found"),
+            @ApiResponse(responseCode = "404", description = "Employee not found")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<EmployeeResponse> getEmployeeById(@PathVariable Long id) {
         log.info("GET /api/v1/employees/{}", id);
         return ResponseEntity.ok(employeeService.findById(id));
     }
 
+
+    @Operation(summary = "Create employee", description = "Create a new employee record")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Employee created successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request payload")
+    })
     @PostMapping
     public ResponseEntity<EmployeeResponse> createEmployee(@Valid @RequestBody EmployeeRequest request) {
         log.info("POST /api/v1/employees - Creating employee: {}", request.getEmail());
         return ResponseEntity.status(HttpStatus.CREATED).body(employeeService.create(request));
     }
 
+    @Operation(summary = "Update employee", description = "Update an existing employee by ID")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Employee updated successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request payload"),
+            @ApiResponse(responseCode = "404", description = "Employee not found")
+    })
     @PutMapping("/{id}")
     public ResponseEntity<EmployeeResponse> updateEmployee(@PathVariable Long id,
                                                            @Valid @RequestBody EmployeeRequest request) {
@@ -64,6 +90,11 @@ public class EmployeeController {
         return ResponseEntity.ok(employeeService.update(id, request));
     }
 
+    @Operation(summary = "Delete employee", description = "Delete an employee by EMp ID")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Employee deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "Employee not found")
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteEmployee(@PathVariable Long id) {
         log.info("DELETE /api/v1/employees/{}", id);
